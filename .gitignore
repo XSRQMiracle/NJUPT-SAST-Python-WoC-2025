@@ -1,4 +1,5 @@
 cifar-10-batches-py/
+SIDD_Medium_Srgb/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

@@ -114,7 +114,7 @@ def create_output_dir(base_dir=None):
     # 使用用户主目录下的持久化路径，避免临时目录数据丢失
     if base_dir is None:
         home_dir = os.path.expanduser('~')
-        base_dir = os.path.join(home_dir, 'cifar10_training_results')
+        base_dir = os.path.join(home_dir, 'cifar10_training_results_cnn')
 
     os.makedirs(base_dir, exist_ok=True)
     date_str = datetime.now().strftime('%Y%m%d_%H%M%S')

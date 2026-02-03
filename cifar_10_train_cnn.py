@@ -12,16 +12,16 @@ from datetime import datetime
 
 #预处理流水线 - 训练集使用数据增强
 transform_train = transforms.Compose([
-    transforms.RandomHorizontalFlip(p=0.5),     # 随机水平翻转
-    transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.05),  # 轻微颜色抖动
+    transforms.RandomCrop(32, padding=4),
+    transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
 ])
 
 #测试集不使用数据增强
 transform_test = transforms.Compose([
     transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
 ])
 
 #加载CIFAR-10数据集
@@ -111,10 +111,9 @@ print(f"Using device: {device}")
 
 # 创建输出目录
 def create_output_dir(base_dir=None):
-    # 使用用户主目录下的持久化路径，避免临时目录数据丢失
+    # 保存到脚本所在目录
     if base_dir is None:
-        home_dir = os.path.expanduser('~')
-        base_dir = os.path.join(home_dir, 'cifar10_training_results_cnn')
+        base_dir = './cifar10_training_results_cnn'
 
     os.makedirs(base_dir, exist_ok=True)
     date_str = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -218,6 +217,7 @@ def save_training_history(history, save_path='training_history.json'):
     print(f'Training history data saved to {save_path}')
 
 
+
 # 主训练流程
 if __name__ == '__main__':
     # 创建输出目录
@@ -227,17 +227,36 @@ if __name__ == '__main__':
     print(f"模型参数量: {sum(p.numel() for p in model.parameters())}")
 
     # 训练参数
-    epochs = 50
+    epochs = 100
     learning_rate = 0.001
     weight_decay = 0.01
+    batch_size = 64
     best_acc = 0
+    best_loss = float('inf')
+    best_epoch = 0
 
     # 定义损失函数和优化器
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
+    # 记录超参数
+    hyperparameters = {
+        'model': 'ResNet (Custom)',
+        'epochs': epochs,
+        'learning_rate': learning_rate,
+        'weight_decay': weight_decay,
+        'batch_size': batch_size,
+        'optimizer': 'AdamW',
+        'loss_function': 'CrossEntropyLoss',
+        'data_augmentation': 'RandomCrop(32, padding=4), RandomHorizontalFlip',
+        'normalization': 'mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010)',
+        'model_parameters': sum(p.numel() for p in model.parameters()),
+        'device': str(device)
+    }
+
     # 训练历史记录
     history = {
+        'hyperparameters': hyperparameters,
         'train_loss': [],
         'train_acc': [],
         'test_loss': [],
@@ -267,13 +286,21 @@ if __name__ == '__main__':
         # 保存最佳模型
         if test_acc > best_acc:
             best_acc = test_acc
+            best_loss = test_loss
+            best_epoch = epoch + 1
             model_path = os.path.join(output_dir, 'best_model.pth')
             torch.save(model.state_dict(), model_path)
             print(f'保存最佳模型，测试准确率: {best_acc:.2f}%')
 
+    # 添加最佳结果到历史记录
+    history['best_test_acc'] = best_acc
+    history['best_test_loss'] = best_loss
+    history['best_epoch'] = best_epoch
+
     # 保存训练历史
     history_json_path = os.path.join(output_dir, 'training_history.json')
     save_training_history(history, history_json_path)
+
 
     # 绘制训练曲线
     history_plot_path = os.path.join(output_dir, 'training_history.png')

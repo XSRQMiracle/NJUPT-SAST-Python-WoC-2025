@@ -41,13 +41,13 @@ train_loader = torch.utils.data.DataLoader(
     train_dataset,
     batch_size=64,
     shuffle=True,
-    num_workers=2
+    num_workers=8
 )
 test_loader = torch.utils.data.DataLoader(
     test_dataset,
     batch_size=64,
     shuffle=False,
-    num_workers=2
+    num_workers=8
 )
 print(f"训练集大小: {len(train_dataset)} 张图片")
 print(f"测试集大小: {len(test_dataset)} 张图片")

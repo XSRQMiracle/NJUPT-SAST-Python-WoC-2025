@@ -1,5 +1,7 @@
 cifar-10-batches-py/
 SIDD_Medium_Srgb/
+CIFAR-10-C/
+cifar10_data/
 *.pth
 *.DS_Store
 # Byte-compiled / optimized / DLL files

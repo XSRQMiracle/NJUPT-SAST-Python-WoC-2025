@@ -3,23 +3,26 @@
 ## 分类任务
 - **数据集**：CIFAR-10（训练 50 K，测试 10 K），图像大小 32×32。
 **模型**：
-  1. 基于CNN的CIFAR-10分类（cifar_10_train_cnn.py）：
+  1. 基于CNN的CIFAR-10分类（train_cnn.py）：
     - **模型结构**：经典卷积神经网络（CNN），包含多层卷积、池化和全连接层。
     - **训练设置**：AdamW优化器，学习率0.001，权重衰减0.01，batch size 64，训练100轮，损失函数为CrossEntropyLoss
     - **结果**：测试集最高准确率85.71%，最佳epoch为99，参数量78042。
-  2. 基于ResNet18的CIFAR-10分类（cifar_10_train_resnet18.py）：
+
+  2. 基于ResNet18的CIFAR-10分类（train_resnet18.py）：
     - **模型结构**：ResNet18残差网络结构。
     - **训练设置**：SGD优化器，学习率0.1，momentum 0.9，weight_decay 0.0005，batch size 128，训练100轮，损失函数为CrossEntropyLoss，学习率在第30/60/80轮衰减为0.2倍
     - **结果**：测试集最高准确率94.8%，最佳epoch为100，参数量11173962。
-  3. 基于Swin Transformer的CIFAR-10分类（cifar_10_train_swin_transformers.py）：
+
+  3. 基于Swin Transformer的CIFAR-10分类（train_swin_transformers.py）：
     - **模型结构**：Swin Transformer结构，利用窗口多层次注意力机制，能够捕捉图像的局部与全局特征。
     - **训练设置**：AdamW优化器，学习率0.0001，权重衰减0.05，batch size 64，训练30轮，损失函数为CrossEntropyLoss，CosineAnnealingLR调度，输入224x224（由32x32 resize）
     - **结果**：测试集最高准确率98.05%，最佳epoch为30，参数量27527044。
+    
 
-## 去噪任务
+## 去噪任务（train_unet.py）
 - **数据集**：SIDD Medium sRGB 数据集，使用 patch 大小 512×512。训练/测试比例9:1。
 - **模型**：
-  1. 基于UNet的SIDD去噪（SIDD_train_unet.py）：
+  1. 基于UNet的SIDD去噪：
      - **模型结构**：UNet带通道注意力（CAB），4级编码器-解码器结构，patch size 512，全局残差学习。
      - **训练设置**：AdamW优化器（betas=0.9,0.9），学习率0.001，权重衰减0，batch size 2，训练100轮，损失函数为CharbonnierLoss (eps=1e-3)，CosineAnnealingLR调度，数据增强包括RandomHFlip、RandomVFlip、RandomRot90，训练集288张，测试集32张。
      - **结果**：测试集最高PSNR 44.58，SSIM 0.985，最佳epoch为99，参数量46750827。
